@@ -1,10 +1,8 @@
 import "./styles.css";
 
-const mySort = (array, sortFn) => {
+const mySort = array => {
   for (let i = 0; i < array.length; i++) {
-    const indicator = sortFn(array[i], array[i + 1]);
-    if (isNaN(indicator)) continue;
-    if (indicator > 0) {
+    if (array[i] > array[i + 1]) {
       const temp = array[i];
       array[i] = array[i + 1];
       array[i + 1] = temp;
@@ -72,12 +70,17 @@ class Game {
         this.scoreType = "Five of a kind!";
         return 50;
       }
-      const sortedScores = mySort(
-        Object.keys(scores),
-        (a, b) => scores[b] - scores[a]
-      );
+      const sortedScores = Object.keys(scores);
+      for (let i = 0; i < sortedScores.length; i++) {
+        if (!sortedScores[i + 1]) continue;
+        if (scores[sortedScores[i + 1]] > scores[sortedScores[i]]) {
+          const temp = sortedScores[i];
+          sortedScores[i] = sortedScores[i + 1];
+          sortedScores[i + 1] = temp;
+        }
+      }
       const highestCount = scores[sortedScores[0]];
-      const numericalOrder = mySort(Object.keys(scores), (a, b) => a - b);
+      const numericalOrder = mySort(Object.keys(scores));
       switch (highestCount) {
         case 4:
           this.scoreType = "Four of a kind";
