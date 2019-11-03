@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Parcel Sandbox</title>
+    <meta charset="UTF-8" />
+  </head>
+
+  <body>
+    <div id="intro">
+      <h1>Welcome to the Dice Game!</h1>
+      <h4>Gameplay</h4>
+      <ul>
+        <li>You have three rolls maximum.</li>
+        <li>
+          On the first roll, you roll all the dice, and on subsequent rolls you
+          can choose to roll some or all of the dice again.
+        </li>
+      </ul>
+      <h4>Scoring</h4>
+      <ul>
+        <li>5 of a Kind: <strong>50 points</strong></li>
+        <li>
+          Large Straight (5 consecutive numbers): <strong>40 points</strong>
+        </li>
+        <li>
+          Small Straight (4 consecutive numbers): <strong>30 points</strong>
+        </li>
+        <li>
+          Full House (three of one number, two of another):
+          <strong>25 points</strong>
+        </li>
+        <li>Other: <strong>sum of dice</strong></li>
+      </ul>
+    </div>
+    <div id="app">
+      <h1>Current Score: <span id="score">0</span></h1>
+      <h3>Rolls: <span id="counter">0</span></h3>
+      <div id="dice">
+        <div class="die" id="0"></div>
+        <div class="die" id="1"></div>
+        <div class="die" id="2"></div>
+        <div class="die" id="3"></div>
+        <div class="die" id="4"></div>
+      </div>
+      <button id="roll">Roll!</button>
+      <button id="keep">Keep This Score</button>
+      <button id="new-round">New Round</button>
+      <button id="reset">Play Again</button>
+      <div id="scores">
+        <h3>My Scores</h3>
+      </div>
+    </div>
+
+    <script src="src/index.js"></script>
+  </body>
+</html>
