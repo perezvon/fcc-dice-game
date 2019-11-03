@@ -21,6 +21,14 @@ const myMap = (array, mapFn) => {
   return mappedArray;
 };
 
+const myReduce = (array, reduceFn, initialValue) => {
+  let result = initialValue;
+  for (let i = 0; i < array.length; i++) {
+    result = reduceFn(result, array[i]);
+  }
+  return result;
+};
+
 const isLargeStraight = arr => {
   if (arr.length < 5) return false;
   let result = true;
@@ -52,7 +60,7 @@ class Game {
   constructor() {
     this.score = 0;
     this.sum = () =>
-      myMap(this.dice, die => die.value).reduce((a, c) => a + c, 0);
+      myReduce(myMap(this.dice, die => die.value), (a, c) => a + c, 0);
     this.calculateCurrentScore = () => {
       const scores = {};
       const values = myMap(this.dice, die => die.value);
