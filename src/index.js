@@ -105,12 +105,11 @@ class Game {
       }
     };
     this.rollDice = () => {
-      const selectedDice =
-        this.numberOfRolls > 0
-          ? this.dice.filter((d, i) =>
-              document.getElementById(i).classList.contains("selected")
-            )
-          : this.dice;
+      let filteredDice = this.dice.filter((d, i) =>
+        document.getElementById(i).classList.contains("selected")
+      );
+      if (!filteredDice.length) filteredDice = this.dice;
+      const selectedDice = this.numberOfRolls > 0 ? filteredDice : this.dice;
       selectedDice.forEach(die => die.roll());
       this.numberOfRolls = this.numberOfRolls + 1;
       this.score = this.calculateCurrentScore();
@@ -132,6 +131,7 @@ class Game {
       document.getElementById("roll").disabled = false;
       document.getElementById("keep").disabled = false;
       this.score = 0;
+      this.resetDice();
       this.updateUI();
       this.rollDice();
     };
