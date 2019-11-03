@@ -1,10 +1,8 @@
 import "./styles.css";
 
-const mySort = (array, sortFn) => {
+const mySort = array => {
   for (let i = 0; i < array.length; i++) {
-    const indicator = sortFn(array[i], array[i + 1]);
-    if (isNaN(indicator)) continue;
-    if (indicator > 0) {
+    if (array[i] > array[i + 1]) {
       const temp = array[i];
       array[i] = array[i + 1];
       array[i + 1] = temp;
@@ -19,6 +17,14 @@ const myMap = (array, mapFn) => {
     mappedArray[i] = mapFn(array[i]);
   }
   return mappedArray;
+};
+
+const myReduce = (array, reduceFn, initialValue) => {
+  let result = initialValue;
+  for (let i = 0; i < array.length; i++) {
+    result = reduceFn(result, array[i]);
+  }
+  return result;
 };
 
 const isLargeStraight = arr => {
@@ -52,7 +58,7 @@ class Game {
   constructor() {
     this.score = 0;
     this.sum = () =>
-      myMap(this.dice, die => die.value).reduce((a, c) => a + c, 0);
+      myReduce(myMap(this.dice, die => die.value), (a, c) => a + c, 0);
     this.calculateCurrentScore = () => {
       const scores = {};
       const values = myMap(this.dice, die => die.value);
@@ -64,12 +70,17 @@ class Game {
         this.scoreType = "Five of a kind!";
         return 50;
       }
-      const sortedScores = mySort(
-        Object.keys(scores),
-        (a, b) => scores[b] - scores[a]
-      );
+      const sortedScores = Object.keys(scores);
+      for (let i = 0; i < sortedScores.length; i++) {
+        if (!sortedScores[i + 1]) continue;
+        if (scores[sortedScores[i + 1]] > scores[sortedScores[i]]) {
+          const temp = sortedScores[i];
+          sortedScores[i] = sortedScores[i + 1];
+          sortedScores[i + 1] = temp;
+        }
+      }
       const highestCount = scores[sortedScores[0]];
-      const numericalOrder = mySort(Object.keys(scores), (a, b) => a - b);
+      const numericalOrder = mySort(Object.keys(scores));
       switch (highestCount) {
         case 4:
           this.scoreType = "Four of a kind";
