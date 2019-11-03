@@ -1,3 +1,3 @@
 # fcc-dice-game
 
-Dice game for freeCodeCamps v7 curriculum
+Dice game for freeCodeCamp's v7 curriculum
