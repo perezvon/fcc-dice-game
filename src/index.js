@@ -1,194 +1,231 @@
-import "./styles.css";
+"use strict";
 
-const mySort = array => {
-  for (let i = 0; i < array.length; i++) {
-    if (array[i] > array[i + 1]) {
-      const temp = array[i];
-      array[i] = array[i + 1];
-      array[i + 1] = temp;
+// Sort the array elements in ascending order
+// imp test case: arr should remain intact
+const selectionSort = arr => {
+  let arrDeepCopy = [];
+  arr.forEach((element, index) => {
+    arrDeepCopy[index] = element;
+  });
+
+  for (let i = 0; i < arrDeepCopy.length - 1; i++) {
+    let smallest = arrDeepCopy[i];
+    let smallestPos = i;
+    for (let j = i + 1; j < arrDeepCopy.length; j++) {
+      if (arrDeepCopy[j] < smallest) {
+        smallest = arrDeepCopy[j];
+        smallestPos = j;
+      }
+    }
+    let temp = arrDeepCopy[i];
+    arrDeepCopy[i] = smallest;
+    arrDeepCopy[smallestPos] = temp;
+  }
+  return arrDeepCopy;
+};
+
+// note: can be made more challenging
+// imp test case: console.log(getTotalConsecutives([1, 2, 3, 5, 6]));
+const getTotalConsecutives = sortedArr => {
+  let totalConsecutives = 0;
+  for (let i = 0, j = 1; j < sortedArr.length; i++, j++) {
+    if (sortedArr[j] === sortedArr[i] + 1) {
+      if (totalConsecutives === 0) totalConsecutives++;
+      totalConsecutives++;
+    } else {
+      break;
     }
   }
-  return array;
+  return totalConsecutives;
 };
 
-const myMap = (array, mapFn) => {
-  const mappedArray = [];
-  for (let i = 0; i < array.length; i++) {
-    mappedArray[i] = mapFn(array[i]);
+const sumOfArrElements = arr => {
+  let arrElementsSum = 0;
+  for (let i = 0; i < arr.length; i++) {
+    arrElementsSum += arr[i];
   }
-  return mappedArray;
+  return arrElementsSum;
 };
 
-const myReduce = (array, reduceFn, initialValue) => {
-  let result = initialValue;
-  for (let i = 0; i < array.length; i++) {
-    result = reduceFn(result, array[i]);
+// imp test case: console.log(getNumOfSameDiceValues([4, 4, 4, 6, 6]));
+const getNumOfSameDiceValues = sortedArr => {
+  const numOfSameDiceValues = {};
+  let count = 0;
+  for (let i = 1; i < sortedArr.length; i++) {
+    let previous = sortedArr[i - 1];
+    if (previous === sortedArr[i]) {
+      if (count === 0) count++;
+      count++;
+    }
+    if (previous !== sortedArr[i] || i === sortedArr.length - 1) {
+      if (count > 0) numOfSameDiceValues[previous] = count;
+      count = 0;
+    }
   }
-  return result;
+  return numOfSameDiceValues;
 };
 
-const isLargeStraight = arr => {
-  if (arr.length < 5) return false;
-  let result = true;
-  arr.forEach((num, index) => {
-    if (arr[index + 1] && +num + 1 !== +arr[index + 1]) result = false;
-  });
-  return result;
-};
+const getSameArrElements = (arrToSearch, arrSearchItems) => {};
 
-const isSmallStraight = arr => {
-  if (arr.length < 4) return false;
-  let result = true;
-  arr.forEach((num, index) => {
-    if (arr[index + 1] && +num + 1 !== +arr[index + 1]) result = false;
-  });
-  return result;
-};
-
-class Die {
-  constructor(value) {
-    this.value = value || "";
-    this.roll = () => {
-      this.value = Math.floor(Math.random() * 6 + 1);
-    };
-  }
-}
-
+// Game class to encapsulate all the properties and methods related to game
 class Game {
   constructor() {
-    this.score = 0;
-    this.sum = () =>
-      myReduce(myMap(this.dice, die => die.value), (a, c) => a + c, 0);
-    this.calculateCurrentScore = () => {
-      const scores = {};
-      const values = myMap(this.dice, die => die.value);
-      values.forEach(
-        value => (scores[value] = scores[value] ? scores[value] + 1 : 1)
-      );
-      const differentNumbers = Object.keys(scores).length;
-      if (differentNumbers === 1) {
-        this.scoreType = "Five of a kind!";
-        return 50;
-      }
-      const sortedScores = Object.keys(scores);
-      for (let i = 0; i < sortedScores.length; i++) {
-        if (!sortedScores[i + 1]) continue;
-        if (scores[sortedScores[i + 1]] > scores[sortedScores[i]]) {
-          const temp = sortedScores[i];
-          sortedScores[i] = sortedScores[i + 1];
-          sortedScores[i + 1] = temp;
+    this.diceValues = [0, 0, 0, 0, 0];
+    this.rollsInCurrentRound = 0;
+    this.totalScore = 0;
+    this.currentRound = 1;
+    this.scoreHistory = {};
+    this.validScoreOptions = {};
+    this.isDiceSelectionOn = false;
+    this.toggleSelection = event => {
+      event.target.classList.toggle("selected");
+    };
+  }
+
+  resetRadioInputs() {
+    document.querySelectorAll("#score-options input").forEach(element => {
+      element.disabled = true;
+      element.checked = false;
+    });
+    document.querySelectorAll("#score-options span").forEach(element => {
+      element.textContent = "";
+    });
+  }
+
+  selectAllDice() {
+    const dieDivs = document.querySelectorAll("#dice > div");
+    dieDivs.forEach(element => {
+      element.classList.add("selected");
+    });
+  }
+
+  toggleDiceSelection() {
+    const dice = document.querySelector("#dice");
+    if (this.isDiceSelectionOn === false) {
+      dice.addEventListener("click", this.toggleSelection);
+    } else {
+      dice.removeEventListener("click", this.toggleSelection);
+    }
+    this.isDiceSelectionOn = !this.isDiceSelectionOn;
+  }
+
+  rollSelectedDice() {
+    const dieDivs = document.querySelectorAll("#dice > div");
+    dieDivs.forEach((element, index) => {
+      if (element.classList.contains("selected"))
+        this.diceValues[index] = element.textContent = Math.ceil(
+          Math.random() * 6
+        );
+    });
+    this.rollsInCurrentRound++;
+  }
+
+  updateUI() {
+    document.querySelector("#current-round").textContent = this.currentRound;
+    document.querySelector("#total-score").textContent = this.totalScore;
+    document.querySelector(
+      "#current-round-rolls"
+    ).textContent = this.rollsInCurrentRound;
+  }
+
+  generateValidScoreOptions() {
+    const sortedDiceValues = selectionSort(this.diceValues);
+    const sumOfDiceValues = sumOfArrElements(this.diceValues);
+    const totalConsecutives = getTotalConsecutives(sortedDiceValues);
+    const numOfSameDiceValues = Object.values(
+      getNumOfSameDiceValues(sortedDiceValues)
+    );
+
+    this.validScoreOptions = {
+      chance: sumOfDiceValues,
+      none: 0
+    };
+
+    if (numOfSameDiceValues[0] === 5) this.validScoreOptions["yahtzee"] = 50;
+    if (numOfSameDiceValues[0] >= 4)
+      this.validScoreOptions["four-of-a-kind"] = sumOfDiceValues;
+    if (totalConsecutives === 5) this.validScoreOptions["large-straight"] = 40;
+    if (totalConsecutives >= 4) this.validScoreOptions["small-straight"] = 30;
+    if (numOfSameDiceValues.length === 2) {
+      if (sumOfArrElements(numOfSameDiceValues) === 5)
+        this.validScoreOptions["full-house"] = 25;
+    }
+    numOfSameDiceValues.forEach(element => {
+      if (element >= 3)
+        this.validScoreOptions["three-of-a-kind"] = sumOfDiceValues;
+    });
+  }
+
+  enableValidScoreInputs() {
+    const allScoreInputs = document.querySelectorAll("#score-options input");
+    const allRadioScores = document.querySelectorAll("#score-options span");
+    const validScoreOptionsKeys = Object.keys(this.validScoreOptions);
+    this.resetRadioInputs();
+
+    for (let i = 0; i < validScoreOptionsKeys.length; i++) {
+      for (let j = 0; j < allScoreInputs.length; j++) {
+        if (validScoreOptionsKeys[i] === allScoreInputs[j].value) {
+          allScoreInputs[j].disabled = false;
+          allRadioScores[j].textContent =
+            ", score = " + this.validScoreOptions[allScoreInputs[j].value];
         }
       }
-      const highestCount = scores[sortedScores[0]];
-      const numericalOrder = mySort(Object.keys(scores));
-      switch (highestCount) {
-        case 4:
-          this.scoreType = "Four of a kind";
-          return this.sum();
-        case 3:
-          if (scores[sortedScores[1]] === 2) {
-            this.scoreType = "Full house";
-            return 25;
-          } else {
-            this.scoreType = "Three of a kind";
-            return this.sum();
-          }
-        case 2:
-          if (isSmallStraight(numericalOrder)) {
-            this.scoreType = "Small straight";
-            return 30;
-          }
-          this.scoreType = "Chance";
-          return this.sum();
-        case 1:
-          if (isLargeStraight(numericalOrder)) {
-            this.scoreType = "Large straight";
-            return 40;
-          } else if (isSmallStraight(numericalOrder)) {
-            this.scoreType = "Small straight";
-            return 30;
-          }
-          this.scoreType = "Chance";
-          return this.sum();
-        default:
-          this.scoreType = "Chance";
-          return this.sum();
+    }
+  }
+
+  isKeepScoreSuccess() {
+    const allScoreInputs = document.querySelectorAll("#score-options input");
+    const allRadioLabels = document.querySelectorAll("#score-options label");
+
+    for (let i = 0; i < allScoreInputs.length; i++) {
+      if (allScoreInputs[i].checked === true) {
+        const currentScore = this.validScoreOptions[allScoreInputs[i].value];
+        this.totalScore += currentScore;
+        this.scoreHistory[allScoreInputs[i].value] = currentScore;
+        this.currentRound++;
+        this.rollsInCurrentRound = 0;
+        if (allScoreInputs[i].value !== "none") {
+          allScoreInputs[i].remove();
+          allRadioLabels[i].remove();
+        }
+        return true;
       }
-    };
-    this.rollDice = () => {
-      let filteredDice = this.dice.filter((d, i) =>
-        document.getElementById(i).classList.contains("selected")
-      );
-      if (!filteredDice.length) filteredDice = this.dice;
-      const selectedDice = this.numberOfRolls > 0 ? filteredDice : this.dice;
-      selectedDice.forEach(die => die.roll());
-      this.numberOfRolls = this.numberOfRolls + 1;
-      this.score = this.calculateCurrentScore();
-      if (this.numberOfRolls === 3) this.recordScore();
-      this.updateUI();
-    };
-    this.recordScore = () => {
-      document.getElementById("scores").innerHTML += `<p>${this.score} - ${
-        this.scoreType
-      }</p>`;
-      document.getElementById("roll").disabled = true;
-      document.getElementById("keep").disabled = true;
-      this.updateUI();
-      this.resetDice();
-    };
-    this.newRound = () => {
-      this.dice = [new Die(), new Die(), new Die(), new Die(), new Die()];
-      this.numberOfRolls = 0;
-      document.getElementById("roll").disabled = false;
-      document.getElementById("keep").disabled = false;
-      this.score = 0;
-      this.resetDice();
-      this.updateUI();
-      this.rollDice();
-    };
-    this.updateUI = () => {
-      document.getElementById("counter").innerHTML = this.numberOfRolls;
-      document.getElementById("score").innerHTML = this.score;
-      const currentDice = document.getElementsByClassName("die");
-      for (let k in currentDice) {
-        currentDice[k].innerHTML = this.dice[k].value;
-      }
-    };
-    this.reset = () => {
-      this.newRound();
-      document.getElementById("scores").innerHTML = "";
-    };
-    this.resetDice = () => {
-      const dice = document.getElementsByClassName("die");
-      for (let k in dice) {
-        dice[k].classList.remove("selected");
-      }
-    };
-    this.dice = [new Die(), new Die(), new Die(), new Die(), new Die()];
-    this.numberOfRolls = 0;
+    }
+    alert("Please select a score.");
+    return false;
   }
 }
 
 const game = new Game();
 
-document
-  .getElementById("roll")
-  .addEventListener("click", () => game.rollDice());
+const rollDiceBtn = document.querySelector("#roll-dice-btn");
+const keepScoreBtn = document.querySelector("#keep-score-btn");
 
-document
-  .getElementById("keep")
-  .addEventListener("click", () => game.recordScore());
+rollDiceBtn.addEventListener("click", function(event) {
+  if (game.currentRound <= 6) {
+    game.rollSelectedDice();
+    game.generateValidScoreOptions();
+    game.enableValidScoreInputs();
+    keepScoreBtn.disabled = false;
+    game.updateUI();
+    if (game.rollsInCurrentRound % 3 === 0) {
+      event.target.disabled = true;
+    } else {
+      if (game.isDiceSelectionOn === false) game.toggleDiceSelection();
+    }
+  }
+});
 
-document.getElementById("reset").addEventListener("click", () => game.reset());
+keepScoreBtn.addEventListener("click", function(event) {
+  if (game.currentRound <= 6) {
+    if (game.isKeepScoreSuccess() === true) {
+      game.resetRadioInputs();
+      game.selectAllDice();
+      game.updateUI();
 
-document
-  .getElementById("new-round")
-  .addEventListener("click", () => game.newRound());
-
-const dice = document.getElementsByClassName("die");
-for (let k in dice) {
-  if (dice[k].classList)
-    dice[k].addEventListener("click", () =>
-      dice[k].classList.toggle("selected")
-    );
-}
+      if (game.isDiceSelectionOn === true) game.toggleDiceSelection();
+      rollDiceBtn.disabled = false;
+      event.target.disabled = true;
+    }
+  }
+});
