@@ -23,15 +23,11 @@ body {
   background-color: rgba(0, 255, 0, 0.1);
 }
 
-input[type="radio"] + label {
+input[type="radio"]:disabled + label {
   color: grey;
-}
-
-input[type="radio"]:enabled + label {
-  color: initial;
 }
 
 button {
   font-size: 1rem;
-  margin-right: 1rem;
+  margin-left: 0.5rem;
 }

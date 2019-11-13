@@ -1,7 +1,7 @@
 "use strict";
 
 // Sort the array elements in ascending order
-// imp test case: arr should remain intact
+// imp test case: input arr should remain intact
 const selectionSort = arr => {
   let arrDeepCopy = [];
   arr.forEach((element, index) => {
@@ -24,7 +24,8 @@ const selectionSort = arr => {
   return arrDeepCopy;
 };
 
-// note: can be made more challenging
+// note: the below function can be made generic by returning
+// the max. number of consecutives
 // imp test case: console.log(getTotalConsecutives([1, 2, 3, 5, 6]));
 const getTotalConsecutives = sortedArr => {
   let totalConsecutives = 0;
@@ -65,6 +66,7 @@ const getNumOfSameDiceValues = sortedArr => {
   return numOfSameDiceValues;
 };
 
+// TO DO
 const getSameArrElements = (arrToSearch, arrSearchItems) => {};
 
 // Game class to encapsulate all the properties and methods related to game
@@ -160,8 +162,9 @@ class Game {
     const allScoreInputs = document.querySelectorAll("#score-options input");
     const allRadioScores = document.querySelectorAll("#score-options span");
     const validScoreOptionsKeys = Object.keys(this.validScoreOptions);
-    this.resetRadioInputs();
 
+    // TO DO: make use of binary search as a utility function
+    // use const getSameArrElements = (arrToSearch, arrSearchItems) => {};
     for (let i = 0; i < validScoreOptionsKeys.length; i++) {
       for (let j = 0; j < allScoreInputs.length; j++) {
         if (validScoreOptionsKeys[i] === allScoreInputs[j].value) {
@@ -206,8 +209,9 @@ rollDiceBtn.addEventListener("click", function(event) {
     game.rollSelectedDice();
     game.generateValidScoreOptions();
     game.enableValidScoreInputs();
-    keepScoreBtn.disabled = false;
     game.updateUI();
+    keepScoreBtn.disabled = false;
+
     if (game.rollsInCurrentRound % 3 === 0) {
       event.target.disabled = true;
     } else {
