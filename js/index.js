@@ -26,15 +26,13 @@ const selectionSort = arr => {
 
 // note: the below function can be made generic by returning
 // the max. number of consecutives
-// imp test case: console.log(getTotalConsecutives([1, 2, 3, 5, 6]));
+// imp test case: console.log(getTotalConsecutives([3, 3, 4, 5, 6]));
 const getTotalConsecutives = sortedArr => {
   let totalConsecutives = 0;
   for (let i = 0, j = 1; j < sortedArr.length; i++, j++) {
     if (sortedArr[j] === sortedArr[i] + 1) {
       if (totalConsecutives === 0) totalConsecutives++;
       totalConsecutives++;
-    } else {
-      break;
     }
   }
   return totalConsecutives;
@@ -95,8 +93,7 @@ class Game {
   }
 
   selectAllDice() {
-    const dieDivs = document.querySelectorAll("#dice > div");
-    dieDivs.forEach(element => {
+    document.querySelectorAll("#dice > div").forEach(element => {
       element.classList.add("selected");
     });
   }
@@ -143,19 +140,26 @@ class Game {
       none: 0
     };
 
-    if (numOfSameDiceValues[0] === 5) this.validScoreOptions["yahtzee"] = 50;
+    for (let i = 0; i < numOfSameDiceValues.length; i++) {
+      if (numOfSameDiceValues[i] >= 3) {
+        this.validScoreOptions["three-of-a-kind"] = sumOfDiceValues;
+        break;
+      }
+    }
+
     if (numOfSameDiceValues[0] >= 4)
       this.validScoreOptions["four-of-a-kind"] = sumOfDiceValues;
-    if (totalConsecutives === 5) this.validScoreOptions["large-straight"] = 40;
-    if (totalConsecutives >= 4) this.validScoreOptions["small-straight"] = 30;
+
     if (numOfSameDiceValues.length === 2) {
       if (sumOfArrElements(numOfSameDiceValues) === 5)
         this.validScoreOptions["full-house"] = 25;
     }
-    numOfSameDiceValues.forEach(element => {
-      if (element >= 3)
-        this.validScoreOptions["three-of-a-kind"] = sumOfDiceValues;
-    });
+
+    if (totalConsecutives >= 4) this.validScoreOptions["small-straight"] = 30;
+
+    if (totalConsecutives === 5) this.validScoreOptions["large-straight"] = 40;
+
+    if (numOfSameDiceValues[0] === 5) this.validScoreOptions["yahtzee"] = 50;
   }
 
   enableValidScoreInputs() {
@@ -187,6 +191,7 @@ class Game {
         this.scoreHistory[allScoreInputs[i].value] = currentScore;
         this.currentRound++;
         this.rollsInCurrentRound = 0;
+
         if (allScoreInputs[i].value !== "none") {
           allScoreInputs[i].remove();
           allRadioLabels[i].remove();
@@ -207,16 +212,14 @@ const keepScoreBtn = document.querySelector("#keep-score-btn");
 rollDiceBtn.addEventListener("click", function(event) {
   if (game.currentRound <= 6) {
     game.rollSelectedDice();
+    game.resetRadioInputs();
     game.generateValidScoreOptions();
     game.enableValidScoreInputs();
     game.updateUI();
-    keepScoreBtn.disabled = false;
 
-    if (game.rollsInCurrentRound % 3 === 0) {
-      event.target.disabled = true;
-    } else {
-      if (game.isDiceSelectionOn === false) game.toggleDiceSelection();
-    }
+    keepScoreBtn.disabled = false;
+    if (game.isDiceSelectionOn === false) game.toggleDiceSelection();
+    if (game.rollsInCurrentRound % 3 === 0) event.target.disabled = true;
   }
 });
 
