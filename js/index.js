@@ -212,6 +212,7 @@ const keepScoreBtn = document.querySelector("#keep-score-btn");
 rollDiceBtn.addEventListener("click", function(event) {
   if (game.currentRound <= 6) {
     game.rollSelectedDice();
+    game.resetRadioInputs();
     game.generateValidScoreOptions();
     game.enableValidScoreInputs();
     game.updateUI();
