@@ -76,10 +76,7 @@ class Game {
     this.currentRound = 1;
     this.scoreHistory = {};
     this.validScoreOptions = {};
-    this.isDiceSelectionOn = false;
-    this.toggleSelection = event => {
-      event.target.classList.toggle("selected");
-    };
+    this.isDiceSelectionEnabled = false;
   }
 
   resetRadioInputs() {
@@ -98,14 +95,11 @@ class Game {
     });
   }
 
-  toggleDiceSelection() {
-    const dice = document.querySelector("#dice");
-    if (this.isDiceSelectionOn === false) {
-      dice.addEventListener("click", this.toggleSelection);
-    } else {
-      dice.removeEventListener("click", this.toggleSelection);
-    }
-    this.isDiceSelectionOn = !this.isDiceSelectionOn;
+  startDiceSelector() {
+    document.querySelector("#dice").addEventListener("click", event => {
+      if (this.isDiceSelectionEnabled === true)
+        event.target.classList.toggle("selected");
+    });
   }
 
   rollSelectedDice() {
@@ -205,6 +199,7 @@ class Game {
 }
 
 const game = new Game();
+game.startDiceSelector();
 
 const rollDiceBtn = document.querySelector("#roll-dice-btn");
 const keepScoreBtn = document.querySelector("#keep-score-btn");
@@ -216,23 +211,19 @@ rollDiceBtn.addEventListener("click", function(event) {
     game.generateValidScoreOptions();
     game.enableValidScoreInputs();
     game.updateUI();
-
+    game.isDiceSelectionEnabled = true;
     keepScoreBtn.disabled = false;
-    if (game.isDiceSelectionOn === false) game.toggleDiceSelection();
     if (game.rollsInCurrentRound % 3 === 0) event.target.disabled = true;
   }
 });
 
 keepScoreBtn.addEventListener("click", function(event) {
-  if (game.currentRound <= 6) {
-    if (game.isKeepScoreSuccess() === true) {
-      game.resetRadioInputs();
-      game.selectAllDice();
-      game.updateUI();
-
-      if (game.isDiceSelectionOn === true) game.toggleDiceSelection();
-      rollDiceBtn.disabled = false;
-      event.target.disabled = true;
-    }
+  if (game.currentRound <= 6 && game.isKeepScoreSuccess() === true) {
+    game.resetRadioInputs();
+    game.selectAllDice();
+    game.updateUI();
+    game.isDiceSelectionEnabled = false;
+    rollDiceBtn.disabled = false;
+    event.target.disabled = true;
   }
 });
