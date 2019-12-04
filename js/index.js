@@ -67,6 +67,9 @@ const getNumOfSameDiceValues = sortedArr => {
 // TO DO
 const getSameArrElements = (arrToSearch, arrSearchItems) => {};
 
+// helper function to map score values to labels
+const mapScoreLabel = (value) => (value[0].toUpperCase() + value.slice(1)).replace(/-/g, ' ');
+
 // Game class to encapsulate all the properties and methods related to game
 class Game {
   constructor() {
@@ -119,6 +122,14 @@ class Game {
     document.querySelector(
       "#current-round-rolls"
     ).textContent = this.rollsInCurrentRound;
+    const scoreboard = document.querySelector("#score-history");
+    scoreboard.textContent = '';
+    for (let [k,v] of Object.entries(this.scoreHistory)) {
+      const score = document.createTextNode(`${mapScoreLabel(k)}: ${v}`);
+      scoreboard.appendChild(score);
+      scoreboard.appendChild(document.createElement("br"))
+    }
+    
   }
 
   generateValidScoreOptions() {
