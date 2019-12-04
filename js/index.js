@@ -194,7 +194,6 @@ class Game {
         const currentScore = this.validScoreOptions[allScoreInputs[i].value];
         this.totalScore += currentScore;
         this.scoreHistory[allScoreInputs[i].value] = currentScore;
-        console.log(this.scoreHistory)
         this.currentRound++;
         this.rollsInCurrentRound = 0;
 
