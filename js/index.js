@@ -26,12 +26,12 @@ const selectionSort = arr => {
 
 // Return the maximum number of consecutives
 // getMaxNumOfConsecutives([2, 3, 3, 3, 4]) should return 3
- // getMaxNumOfConsecutives([2, 3, 3, 7, 8, 9, 10]) should return 4
+// getMaxNumOfConsecutives([2, 3, 3, 7, 8, 9, 10]) should return 4
 const getMaxNumOfConsecutives = sortedArr => {
   let currentCount = 0;
   let maxCount = 0;
 
-  for (let prev = 0, next = 1; next < sortedArr.length; prev++, next++) {
+  for (let prev = 0, next = 1; next < sortedArr.length; prev++ , next++) {
     if (sortedArr[next] - sortedArr[prev] === 1) {
       if (currentCount === 0) currentCount++;
       currentCount++;
@@ -72,7 +72,7 @@ const getNumOfSameDiceValues = sortedArr => {
 };
 
 // TO DO
-const getSameArrElements = (arrToSearch, arrSearchItems) => {};
+const getSameArrElements = (arrToSearch, arrSearchItems) => { };
 
 // Map score values to labels
 const mapScoreLabel = value =>
@@ -124,18 +124,19 @@ class Game {
     this.rollsInCurrentRound++;
   }
 
-  updateUI() {
+  updateUI(currentScore) {
     document.querySelector("#current-round").textContent = this.currentRound;
     document.querySelector("#total-score").textContent = this.totalScore;
     document.querySelector(
       "#current-round-rolls"
     ).textContent = this.rollsInCurrentRound;
-    const scoreboard = document.querySelector("#score-history");
-    scoreboard.textContent = "";
-    for (let [k, v] of Object.entries(this.scoreHistory)) {
-      const score = document.createTextNode(`${mapScoreLabel(k)}: ${v}`);
-      scoreboard.appendChild(score);
-      scoreboard.appendChild(document.createElement("br"));
+
+    if (currentScore) {
+      const scoreboard = document.querySelector("#score-history");
+      const [type, score] = Object.entries(currentScore)[0];
+      const scoreEl = document.createTextNode(`${mapScoreLabel(type)}: ${score}`);
+      scoreboard.appendChild(scoreEl);
+      scoreboard.appendChild(document.createElement("br"))
     }
   }
 
@@ -198,7 +199,8 @@ class Game {
 
     for (let i = 0; i < allScoreInputs.length; i++) {
       if (allScoreInputs[i].checked === true) {
-        const currentScore = this.validScoreOptions[allScoreInputs[i].value];
+        const currentValue = allScoreInputs[i].value;
+        const currentScore = this.validScoreOptions[currentValue];
         this.totalScore += currentScore;
         this.scoreHistory[allScoreInputs[i].value] = currentScore;
         this.currentRound++;
@@ -208,7 +210,7 @@ class Game {
           allScoreInputs[i].remove();
           allRadioLabels[i].remove();
         }
-        return true;
+        return { [currentValue]: currentScore };
       }
     }
     alert("Please select a score.");
@@ -222,7 +224,7 @@ game.startDiceSelector();
 const rollDiceBtn = document.querySelector("#roll-dice-btn");
 const keepScoreBtn = document.querySelector("#keep-score-btn");
 
-rollDiceBtn.addEventListener("click", function(event) {
+rollDiceBtn.addEventListener("click", function (event) {
   if (game.currentRound <= 6) {
     game.rollSelectedDice();
     game.resetRadioInputs();
@@ -235,11 +237,12 @@ rollDiceBtn.addEventListener("click", function(event) {
   }
 });
 
-keepScoreBtn.addEventListener("click", function(event) {
-  if (game.currentRound <= 6 && game.isKeepScoreSuccess() === true) {
+keepScoreBtn.addEventListener("click", function (event) {
+  const currentScore = game.isKeepScoreSuccess();
+  if (game.currentRound <= 6 && currentScore) {
     game.resetRadioInputs();
     game.selectAllDice();
-    game.updateUI();
+    game.updateUI(currentScore);
     game.isDiceSelectionEnabled = false;
     rollDiceBtn.disabled = false;
     event.target.disabled = true;
