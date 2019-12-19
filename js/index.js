@@ -116,20 +116,19 @@ class Game {
     this.rollsInCurrentRound++;
   }
 
-  updateUI() {
+  updateUI(currentScore) {
     document.querySelector("#current-round").textContent = this.currentRound;
     document.querySelector("#total-score").textContent = this.totalScore;
     document.querySelector(
       "#current-round-rolls"
     ).textContent = this.rollsInCurrentRound;
-    const scoreboard = document.querySelector("#score-history");
-    scoreboard.textContent = '';
-    for (let [k,v] of Object.entries(this.scoreHistory)) {
-      const score = document.createTextNode(`${mapScoreLabel(k)}: ${v}`);
-      scoreboard.appendChild(score);
+    if (currentScore) {
+      const scoreboard = document.querySelector("#score-history");
+      const [type, score] = Object.entries(currentScore)[0];
+      const scoreEl = document.createTextNode(`${mapScoreLabel(type)}: ${score}`);
+      scoreboard.appendChild(scoreEl);
       scoreboard.appendChild(document.createElement("br"))
     }
-    
   }
 
   generateValidScoreOptions() {
@@ -191,7 +190,8 @@ class Game {
 
     for (let i = 0; i < allScoreInputs.length; i++) {
       if (allScoreInputs[i].checked === true) {
-        const currentScore = this.validScoreOptions[allScoreInputs[i].value];
+        const currentValue = allScoreInputs[i].value;
+        const currentScore = this.validScoreOptions[currentValue];
         this.totalScore += currentScore;
         this.scoreHistory[allScoreInputs[i].value] = currentScore;
         this.currentRound++;
@@ -201,7 +201,7 @@ class Game {
           allScoreInputs[i].remove();
           allRadioLabels[i].remove();
         }
-        return true;
+        return { [currentValue]: currentScore };
       }
     }
     alert("Please select a score.");
@@ -229,10 +229,11 @@ rollDiceBtn.addEventListener("click", function(event) {
 });
 
 keepScoreBtn.addEventListener("click", function(event) {
-  if (game.currentRound <= 6 && game.isKeepScoreSuccess() === true) {
+  const currentScore = game.isKeepScoreSuccess();
+  if (game.currentRound <= 6 && currentScore) {
     game.resetRadioInputs();
     game.selectAllDice();
-    game.updateUI();
+    game.updateUI(currentScore);
     game.isDiceSelectionEnabled = false;
     rollDiceBtn.disabled = false;
     event.target.disabled = true;
