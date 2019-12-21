@@ -24,18 +24,24 @@ const selectionSort = arr => {
   return arrDeepCopy;
 };
 
-// note: the below function can be made generic by returning
-// the max. number of consecutives
-// imp test case: console.log(getTotalConsecutives([3, 3, 4, 5, 6]));
-const getTotalConsecutives = sortedArr => {
-  let totalConsecutives = 0;
-  for (let i = 0, j = 1; j < sortedArr.length; i++, j++) {
-    if (sortedArr[j] === sortedArr[i] + 1) {
-      if (totalConsecutives === 0) totalConsecutives++;
-      totalConsecutives++;
+// Return the maximum number of consecutives
+// getMaxNumOfConsecutives([2, 3, 3, 3, 4]) should return 3
+ // getMaxNumOfConsecutives([2, 3, 3, 7, 8, 9, 10]) should return 4
+const getMaxNumOfConsecutives = sortedArr => {
+  let currentCount = 0;
+  let maxCount = 0;
+
+  for (let prev = 0, next = 1; next < sortedArr.length; prev++, next++) {
+    if (sortedArr[next] - sortedArr[prev] === 1) {
+      if (currentCount === 0) currentCount++;
+      currentCount++;
+    }
+    if (sortedArr[next] - sortedArr[prev] > 1 || next === sortedArr.length - 1) {
+      if (currentCount > maxCount) maxCount = currentCount;
+      currentCount = 0;
     }
   }
-  return totalConsecutives;
+  return maxCount;
 };
 
 const sumOfArrElements = arr => {
@@ -46,7 +52,8 @@ const sumOfArrElements = arr => {
   return arrElementsSum;
 };
 
-// imp test case: console.log(getNumOfSameDiceValues([4, 4, 4, 6, 6]));
+// Return an object with number of die having same value
+// getNumOfSameDiceValues([4, 4, 4, 6, 6]) should return {4: 3, 6: 2}
 const getNumOfSameDiceValues = sortedArr => {
   const numOfSameDiceValues = {};
   let count = 0;
@@ -67,8 +74,9 @@ const getNumOfSameDiceValues = sortedArr => {
 // TO DO
 const getSameArrElements = (arrToSearch, arrSearchItems) => {};
 
-// helper function to map score values to labels
-const mapScoreLabel = (value) => (value[0].toUpperCase() + value.slice(1)).replace(/-/g, ' ');
+// Map score values to labels
+const mapScoreLabel = value =>
+  (value[0].toUpperCase() + value.slice(1)).replace(/-/g, " ");
 
 // Game class to encapsulate all the properties and methods related to game
 class Game {
@@ -123,19 +131,18 @@ class Game {
       "#current-round-rolls"
     ).textContent = this.rollsInCurrentRound;
     const scoreboard = document.querySelector("#score-history");
-    scoreboard.textContent = '';
-    for (let [k,v] of Object.entries(this.scoreHistory)) {
+    scoreboard.textContent = "";
+    for (let [k, v] of Object.entries(this.scoreHistory)) {
       const score = document.createTextNode(`${mapScoreLabel(k)}: ${v}`);
       scoreboard.appendChild(score);
-      scoreboard.appendChild(document.createElement("br"))
+      scoreboard.appendChild(document.createElement("br"));
     }
-    
   }
 
   generateValidScoreOptions() {
     const sortedDiceValues = selectionSort(this.diceValues);
     const sumOfDiceValues = sumOfArrElements(this.diceValues);
-    const totalConsecutives = getTotalConsecutives(sortedDiceValues);
+    const totalConsecutives = getMaxNumOfConsecutives(sortedDiceValues);
     const numOfSameDiceValues = Object.values(
       getNumOfSameDiceValues(sortedDiceValues)
     );
