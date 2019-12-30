@@ -77,7 +77,7 @@ class Game {
     this.rollsInCurrentRound = 0;
     this.totalScore = 0;
     this.currentRound = 1;
-    this.scoreHistory = {};
+    this.scoreHistory = [];
     this.validScoreOptions = {};
     this.isDiceSelectionEnabled = false;
   }
@@ -193,7 +193,7 @@ class Game {
         const currentValue = allScoreInputs[i].value;
         const currentScore = this.validScoreOptions[currentValue];
         this.totalScore += currentScore;
-        this.scoreHistory[allScoreInputs[i].value] = currentScore;
+        this.scoreHistory.push({ [allScoreInputs[i].value]: currentScore })
         this.currentRound++;
         this.rollsInCurrentRound = 0;
 
