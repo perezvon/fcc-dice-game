@@ -31,12 +31,15 @@ const getMaxNumOfConsecutives = sortedArr => {
   let currentCount = 0;
   let maxCount = 0;
 
-  for (let prev = 0, next = 1; next < sortedArr.length; prev++ , next++) {
+  for (let prev = 0, next = 1; next < sortedArr.length; prev++, next++) {
     if (sortedArr[next] - sortedArr[prev] === 1) {
       if (currentCount === 0) currentCount++;
       currentCount++;
     }
-    if (sortedArr[next] - sortedArr[prev] > 1 || next === sortedArr.length - 1) {
+    if (
+      sortedArr[next] - sortedArr[prev] > 1 ||
+      next === sortedArr.length - 1
+    ) {
       if (currentCount > maxCount) maxCount = currentCount;
       currentCount = 0;
     }
@@ -72,7 +75,7 @@ const getNumOfSameDiceValues = sortedArr => {
 };
 
 // TO DO
-const getSameArrElements = (arrToSearch, arrSearchItems) => { };
+const getSameArrElements = (arrToSearch, arrSearchItems) => {};
 
 // Map score values to labels
 const mapScoreLabel = value =>
@@ -130,12 +133,16 @@ class Game {
     document.querySelector(
       "#current-round-rolls"
     ).textContent = this.rollsInCurrentRound;
+
     if (currentScore) {
       const scoreboard = document.querySelector("#score-history");
+      const scoreEntry = document.createElement("li");
       const [type, score] = Object.entries(currentScore)[0];
-      const scoreEl = document.createTextNode(`${mapScoreLabel(type)}: ${score}`);
-      scoreboard.appendChild(scoreEl);
-      scoreboard.appendChild(document.createElement("br"))
+      const formattedScore = document.createTextNode(
+        `${mapScoreLabel(type)}: ${score}`
+      );
+      scoreEntry.appendChild(formattedScore);
+      scoreboard.appendChild(scoreEntry);
     }
   }
 
@@ -201,7 +208,7 @@ class Game {
         const currentValue = allScoreInputs[i].value;
         const currentScore = this.validScoreOptions[currentValue];
         this.totalScore += currentScore;
-        this.scoreHistory.push({ [allScoreInputs[i].value]: currentScore })
+        this.scoreHistory.push({ [allScoreInputs[i].value]: currentScore });
         this.currentRound++;
         this.rollsInCurrentRound = 0;
 
@@ -223,7 +230,7 @@ game.startDiceSelector();
 const rollDiceBtn = document.querySelector("#roll-dice-btn");
 const keepScoreBtn = document.querySelector("#keep-score-btn");
 
-rollDiceBtn.addEventListener("click", function (event) {
+rollDiceBtn.addEventListener("click", function(event) {
   if (game.currentRound <= 6) {
     game.rollSelectedDice();
     game.resetRadioInputs();
@@ -236,14 +243,18 @@ rollDiceBtn.addEventListener("click", function (event) {
   }
 });
 
-keepScoreBtn.addEventListener("click", function (event) {
+keepScoreBtn.addEventListener("click", function(event) {
   const currentScore = game.isKeepScoreSuccess();
-  if (game.currentRound <= 6 && currentScore) {
+  if (game.currentRound <= 7 && currentScore) {
     game.resetRadioInputs();
     game.selectAllDice();
     game.updateUI(currentScore);
     game.isDiceSelectionEnabled = false;
     rollDiceBtn.disabled = false;
     event.target.disabled = true;
+  } else if (game.currentRound === 7) {
+    alert(
+      `Well played. You scored ${game.totalScore} points. You can reload the page to play again.`
+    );
   }
 });
