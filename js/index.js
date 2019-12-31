@@ -127,17 +127,19 @@ class Game {
     this.rollsInCurrentRound++;
   }
 
-  updateUI(currentScore) {
+  updateUI(isScoreUpdateAllowed) {
     document.querySelector("#current-round").textContent = this.currentRound;
     document.querySelector("#total-score").textContent = this.totalScore;
     document.querySelector(
       "#current-round-rolls"
     ).textContent = this.rollsInCurrentRound;
 
-    if (currentScore) {
+    if (isScoreUpdateAllowed) {
       const scoreboard = document.querySelector("#score-history");
       const scoreEntry = document.createElement("li");
-      const [type, score] = Object.entries(currentScore)[0];
+      const [type, score] = Object.entries(
+        game.scoreHistory[game.scoreHistory.length - 1]
+      )[0];
       const formattedScore = document.createTextNode(
         `${mapScoreLabel(type)}: ${score}`
       );
@@ -216,7 +218,7 @@ class Game {
           allScoreInputs[i].remove();
           allRadioLabels[i].remove();
         }
-        return { [currentValue]: currentScore };
+        return true;
       }
     }
     alert("Please select a score.");
@@ -236,7 +238,7 @@ rollDiceBtn.addEventListener("click", function(event) {
     game.resetRadioInputs();
     game.generateValidScoreOptions();
     game.enableValidScoreInputs();
-    game.updateUI();
+    game.updateUI(false);
     game.isDiceSelectionEnabled = true;
     keepScoreBtn.disabled = false;
     if (game.rollsInCurrentRound % 3 === 0) event.target.disabled = true;
@@ -244,17 +246,12 @@ rollDiceBtn.addEventListener("click", function(event) {
 });
 
 keepScoreBtn.addEventListener("click", function(event) {
-  const currentScore = game.isKeepScoreSuccess();
-  if (game.currentRound <= 7 && currentScore) {
+  if (game.currentRound <= 6 && game.isKeepScoreSuccess()) {
     game.resetRadioInputs();
     game.selectAllDice();
-    game.updateUI(currentScore);
+    game.updateUI(true);
     game.isDiceSelectionEnabled = false;
     rollDiceBtn.disabled = false;
     event.target.disabled = true;
-  } else if (game.currentRound === 7) {
-    alert(
-      `Well played. You scored ${game.totalScore} points. You can reload the page to play again.`
-    );
-  }
+  } 
 });
