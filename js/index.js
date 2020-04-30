@@ -1,8 +1,8 @@
 "use strict";
 
 // Sort the array elements in ascending order
-// imp test case: input arr should remain intact
-const selectionSort = arr => {
+// Important test case: input array should not change as arrays are passed by reference
+const selectionSort = (arr) => {
   let arrDeepCopy = [];
   arr.forEach((element, index) => {
     arrDeepCopy[index] = element;
@@ -27,7 +27,7 @@ const selectionSort = arr => {
 // Return the maximum number of consecutives
 // getMaxNumOfConsecutives([2, 3, 3, 3, 4]) should return 3
 // getMaxNumOfConsecutives([2, 3, 3, 7, 8, 9, 10]) should return 4
-const getMaxNumOfConsecutives = sortedArr => {
+const getMaxNumOfConsecutives = (sortedArr) => {
   let currentCount = 0;
   let maxCount = 0;
 
@@ -47,7 +47,8 @@ const getMaxNumOfConsecutives = sortedArr => {
   return maxCount;
 };
 
-const sumOfArrElements = arr => {
+// Sum the elements of an integer array
+const sumOfArrElements = (arr) => {
   let arrElementsSum = 0;
   for (let i = 0; i < arr.length; i++) {
     arrElementsSum += arr[i];
@@ -57,7 +58,7 @@ const sumOfArrElements = arr => {
 
 // Return an object with number of die having same value
 // getNumOfSameDiceValues([4, 4, 4, 6, 6]) should return {4: 3, 6: 2}
-const getNumOfSameDiceValues = sortedArr => {
+const getNumOfSameDiceValues = (sortedArr) => {
   const numOfSameDiceValues = {};
   let count = 0;
   for (let i = 1; i < sortedArr.length; i++) {
@@ -74,13 +75,6 @@ const getNumOfSameDiceValues = sortedArr => {
   return numOfSameDiceValues;
 };
 
-// TO DO
-const getSameArrElements = (arrToSearch, arrSearchItems) => {};
-
-// Map score values to labels
-const mapScoreLabel = value =>
-  (value[0].toUpperCase() + value.slice(1)).replace(/-/g, " ");
-
 // Game class to encapsulate all the properties and methods related to game
 class Game {
   constructor() {
@@ -94,23 +88,23 @@ class Game {
   }
 
   resetRadioInputs() {
-    document.querySelectorAll("#score-options input").forEach(element => {
+    document.querySelectorAll("#score-options input").forEach((element) => {
       element.disabled = true;
       element.checked = false;
     });
-    document.querySelectorAll("#score-options span").forEach(element => {
+    document.querySelectorAll("#score-options span").forEach((element) => {
       element.textContent = "";
     });
   }
 
   selectAllDice() {
-    document.querySelectorAll("#dice > div").forEach(element => {
+    document.querySelectorAll("#dice > div").forEach((element) => {
       element.classList.add("selected");
     });
   }
 
   startDiceSelector() {
-    document.querySelector("#dice").addEventListener("click", event => {
+    document.querySelector("#dice").addEventListener("click", (event) => {
       if (this.isDiceSelectionEnabled === true)
         event.target.classList.toggle("selected");
     });
@@ -127,25 +121,31 @@ class Game {
     this.rollsInCurrentRound++;
   }
 
-  updateUI(isScoreUpdateAllowed) {
+  updateStatsUI() {
     document.querySelector("#current-round").textContent = this.currentRound;
     document.querySelector("#total-score").textContent = this.totalScore;
     document.querySelector(
       "#current-round-rolls"
     ).textContent = this.rollsInCurrentRound;
+  }
 
-    if (isScoreUpdateAllowed) {
-      const scoreboard = document.querySelector("#score-history");
-      const scoreEntry = document.createElement("li");
-      const [type, score] = Object.entries(
-        game.scoreHistory[game.scoreHistory.length - 1]
-      )[0];
-      const formattedScore = document.createTextNode(
-        `${mapScoreLabel(type)}: ${score}`
-      );
-      scoreEntry.appendChild(formattedScore);
-      scoreboard.appendChild(scoreEntry);
-    }
+  updateScoreUI() {
+    const scoreboard = document.querySelector("#score-history");
+    const scoreEntry = document.createElement("li");
+    const [type, score] = Object.entries(
+      game.scoreHistory[game.scoreHistory.length - 1]
+    )[0];
+
+    const formattedScoreType = (type[0].toUpperCase() + type.slice(1)).replace(
+      /-/g,
+      " "
+    );
+
+    const formattedScore = document.createTextNode(
+      `${formattedScoreType}: ${score}`
+    );
+    scoreEntry.appendChild(formattedScore);
+    scoreboard.appendChild(scoreEntry);
   }
 
   generateValidScoreOptions() {
@@ -158,7 +158,7 @@ class Game {
 
     this.validScoreOptions = {
       chance: sumOfDiceValues,
-      none: 0
+      none: 0,
     };
 
     for (let i = 0; i < numOfSameDiceValues.length; i++) {
@@ -184,18 +184,21 @@ class Game {
   }
 
   enableValidScoreInputs() {
-    const allScoreInputs = document.querySelectorAll("#score-options input");
-    const allRadioScores = document.querySelectorAll("#score-options span");
+    const availableScoreInputs = document.querySelectorAll(
+      "#score-options input"
+    );
+    const availableRadioScores = document.querySelectorAll(
+      "#score-options span"
+    );
     const validScoreOptionsKeys = Object.keys(this.validScoreOptions);
 
-    // TO DO: make use of binary search as a utility function
-    // use const getSameArrElements = (arrToSearch, arrSearchItems) => {};
     for (let i = 0; i < validScoreOptionsKeys.length; i++) {
-      for (let j = 0; j < allScoreInputs.length; j++) {
-        if (validScoreOptionsKeys[i] === allScoreInputs[j].value) {
-          allScoreInputs[j].disabled = false;
-          allRadioScores[j].textContent =
-            ", score = " + this.validScoreOptions[allScoreInputs[j].value];
+      for (let j = 0; j < availableScoreInputs.length; j++) {
+        if (validScoreOptionsKeys[i] === availableScoreInputs[j].value) {
+          availableScoreInputs[j].disabled = false;
+          availableRadioScores[j].textContent =
+            ", score = " +
+            this.validScoreOptions[availableScoreInputs[j].value];
         }
       }
     }
@@ -224,6 +227,15 @@ class Game {
     alert("Please select a score.");
     return false;
   }
+
+  gameOver() {
+    if (
+      confirm(
+        `You scored ${game.totalScore} points. Do you want to play again?`
+      )
+    )
+      location.reload();
+  }
 }
 
 const game = new Game();
@@ -232,26 +244,30 @@ game.startDiceSelector();
 const rollDiceBtn = document.querySelector("#roll-dice-btn");
 const keepScoreBtn = document.querySelector("#keep-score-btn");
 
-rollDiceBtn.addEventListener("click", function(event) {
+rollDiceBtn.addEventListener("click", function (event) {
   if (game.currentRound <= 6) {
     game.rollSelectedDice();
     game.resetRadioInputs();
     game.generateValidScoreOptions();
     game.enableValidScoreInputs();
-    game.updateUI(false);
+    game.updateStatsUI();
     game.isDiceSelectionEnabled = true;
     keepScoreBtn.disabled = false;
     if (game.rollsInCurrentRound % 3 === 0) event.target.disabled = true;
   }
 });
 
-keepScoreBtn.addEventListener("click", function(event) {
+keepScoreBtn.addEventListener("click", function (event) {
   if (game.currentRound <= 6 && game.isKeepScoreSuccess()) {
     game.resetRadioInputs();
     game.selectAllDice();
-    game.updateUI(true);
+    game.updateStatsUI();
+    game.updateScoreUI();
     game.isDiceSelectionEnabled = false;
     rollDiceBtn.disabled = false;
     event.target.disabled = true;
-  } 
+  }
+  if (game.currentRound > 6)
+    // Give DOM some time to complete manipulation then check & run gameOver
+    setTimeout(game.gameOver, 100);
 });
