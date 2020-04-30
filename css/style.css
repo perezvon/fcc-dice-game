@@ -1,5 +1,11 @@
 body {
-  font-family: sans-serif;
+  font: 16px system-ui;
+}
+
+main {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 1rem;
 }
 
 #dice {
